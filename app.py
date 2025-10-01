@@ -44,6 +44,18 @@ st.markdown("""
     .stMarkdown {
         color: black !important;
     }
+    .recommendations, .recommendations * {
+        color: black !important;
+    }
+    .custom-success {
+        color: black !important;
+        background-color: rgba(76, 175, 80, 0.2) !important;
+        border: 1px solid #4CAF50;
+        padding: 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
     .stButton button {
         background-color: white !important;
         color: black !important;
@@ -122,8 +134,9 @@ if st.button("Get Travel Recommendations", type="primary"):
                 }
                 recommendations = get_travel_recommendations(user_inputs)
 
-                st.success("Here are your personalized travel recommendations!")
-                st.markdown(recommendations)
+                # st.success("Here are your personalized travel recommendations!")
+                st.markdown('<div class="custom-success">Here are your personalized travel recommendations!</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="recommendations">{recommendations}</div>', unsafe_allow_html=True)
 
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
