@@ -29,7 +29,28 @@ def set_bg_with_overlay(img_path, overlay_rgba="rgba(255,255,255,0.3)"):
         unsafe_allow_html=True
     )
 
+def set_sidebar_bg(img_path):
+    with open(img_path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+    st.markdown(
+        f"""
+        <style>
+        [data-testid="stSidebar"] > div:first-child {{
+            background-image: url("data:image/png;base64,{b64}");
+            background-size: cover;
+            background-position: center;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 set_bg_with_overlay("pic1.jpg", overlay_rgba="rgba(255,255,255,0.3)")
+
+set_sidebar_bg("pic2a.jpg")
+
+# Sidebar navigation
+page = st.sidebar.radio("Navigation", ["Home", "About"])
 
 # Custom CSS for travel vibes and text color
 st.markdown("""
@@ -110,39 +131,46 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Title and description with explicit black color
-st.markdown('<h1 style="color:black;">✈️ AI Travel Guider</h1>', unsafe_allow_html=True)
-st.markdown('<p style="color:black;">Discover your perfect travel destinations based on your interests!</p>', unsafe_allow_html=True)
+if page == "Home":
+    # Title and description with explicit black color
+    st.markdown('<h1 style="color:black;">✈️ AI Travel Guider</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="color:black;">Discover your perfect travel destinations based on your interests!</p>', unsafe_allow_html=True)
 
-# Main content
-st.markdown('<h2 style="color:black;">Tell us about your interests</h2>', unsafe_allow_html=True)
-user_interests = st.text_area(
-    "What do you love to explore? (e.g., hiking, beaches, historical sites, food, wildlife)",
-    height=100,
-    placeholder="Describe your travel interests, favorite activities, or types of places you enjoy...",
-)
+    # Main content
+    st.markdown('<h2 style="color:black;">Tell us about your interests</h2>', unsafe_allow_html=True)
+    user_interests = st.text_area(
+        "What do you love to explore? (e.g., hiking, beaches, historical sites, food, wildlife)",
+        height=100,
+        placeholder="Describe your travel interests, favorite activities, or types of places you enjoy...",
+    )
 
-# Generate recommendations button
-if st.button("Get Travel Recommendations", type="primary"):
-    if user_interests.strip():
-        with st.spinner("Generating personalized travel recommendations..."):
-            try:
-                # Collect user inputs
-                user_inputs = {
-                    'user_interests': user_interests,
-                    'currency': 'USD',
-                }
-                recommendations = get_travel_recommendations(user_inputs)
+    # Generate recommendations button
+    if st.button("Get Travel Recommendations", type="primary"):
+        if user_interests.strip():
+            with st.spinner("Generating personalized travel recommendations..."):
+                try:
+                    # Collect user inputs
+                    user_inputs = {
+                        'user_interests': user_interests,
+                        'currency': 'USD',
+                    }
+                    recommendations = get_travel_recommendations(user_inputs)
 
-                # st.success("Here are your personalized travel recommendations!")
-                st.markdown('<div class="custom-success">Here are your personalized travel recommendations!</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="recommendations">{recommendations}</div>', unsafe_allow_html=True)
+                    # st.success("Here are your personalized travel recommendations!")
+                    st.markdown('<div class="custom-success">Here are your personalized travel recommendations!</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="recommendations">{recommendations}</div>', unsafe_allow_html=True)
 
-            except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
-                st.info("Please check your Groq API key in the .env file and ensure all dependencies are installed.")
-    else:
-        st.warning("Please enter your interests to get recommendations.")
+                except Exception as e:
+                    st.error(f"An error occurred: {str(e)}")
+                    st.info("Please check your Groq API key in the .env file and ensure all dependencies are installed.")
+        else:
+            st.warning("Please enter your interests to get recommendations.")
+
+elif page == "About":
+    st.markdown('<h1 style="color:black;">About AI Travel Guider</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="color:black;">This app uses AI to provide personalized travel recommendations based on your interests. Powered by Groq AI and built with Streamlit.</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:black;">Features:</p>', unsafe_allow_html=True)
+    st.markdown('- Personalized destination suggestions\n- Weather information\n- Packing checklists\n- Budget breakdowns\n- Safety tips', unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
