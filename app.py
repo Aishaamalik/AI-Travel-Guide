@@ -8,21 +8,41 @@ st.set_page_config(
     layout="wide"
 )
 
+# Custom CSS for travel vibes
+st.markdown("""
+<style>
+    .main {
+        background: linear-gradient(135deg, #0E1117 0%, #1a1a2e 50%, #16213e 100%);
+        color: #FAFAFA;
+    }
+    .stTitle {
+        color: #00BFFF !important;
+        font-weight: bold;
+    }
+    .stMarkdown {
+        color: #FAFAFA;
+    }
+    .stButton button {
+        background-color: #00BFFF !important;
+        color: white !important;
+        border-radius: 10px !important;
+        font-weight: bold !important;
+    }
+    .stTextArea textarea {
+        background-color: #262730 !important;
+        color: #FAFAFA !important;
+        border: 1px solid #00BFFF !important;
+    }
+    .stSelectbox select, .stSlider {
+        background-color: #262730 !important;
+        color: #FAFAFA !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Title and description
 st.title("✈️ AI Travel Guider")
 st.markdown("Discover your perfect travel destinations based on your interests!")
-
-# Sidebar for additional features
-st.sidebar.header("Travel Preferences")
-destination_type = st.sidebar.selectbox(
-    "Preferred Destination Type",
-    ["Adventure", "Relaxation", "Cultural", "Nature", "City", "Beach", "Mountain", "Any"]
-)
-budget_range = st.sidebar.selectbox(
-    "Budget Range",
-    ["Budget", "Mid-range", "Luxury", "Any"]
-)
-travel_duration = st.sidebar.slider("Travel Duration (days)", 1, 30, 7)
 
 # Main content
 st.header("Tell us about your interests")
@@ -40,9 +60,7 @@ if st.button("Get Travel Recommendations", type="primary"):
                 # Collect user inputs
                 user_inputs = {
                     'user_interests': user_interests,
-                    'travel_style': budget_range.lower() if budget_range != "Any" else "",
-                    'trip_length_days': travel_duration,
-                    'currency': 'USD',  # Default, can add input later
+                    'currency': 'USD',
                 }
                 recommendations = get_travel_recommendations(user_inputs)
 
