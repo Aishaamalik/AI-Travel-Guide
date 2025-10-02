@@ -248,7 +248,9 @@ elif page == "Day-By-Day Plan":
     st.markdown('<p style="color:black;">Get a detailed day-by-day itinerary for your chosen destination.</p>', unsafe_allow_html=True)
 
     destination = st.text_input("Enter the destination (e.g., Paris, France)", placeholder="e.g., Tokyo, Japan")
+    st.markdown('<style>div[data-testid="stTextInput"] > label {color: black !important;}</style>', unsafe_allow_html=True)
     days = st.number_input("Number of days", min_value=1, max_value=30, value=7, step=1)
+    st.markdown('<style>div[data-testid="stNumberInput"] > label {color: black !important;}</style>', unsafe_allow_html=True)
 
     if st.button("Generate Day-By-Day Plan", type="primary"):
         if destination.strip():
