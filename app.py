@@ -49,8 +49,27 @@ set_bg_with_overlay("pic1.jpg", overlay_rgba="rgba(255,255,255,0.3)")
 
 set_sidebar_bg("pic2a.jpg")
 
+import json
+import os
+
 # Sidebar navigation
-page = st.sidebar.radio("Navigation", ["Home", "About"])
+page = st.sidebar.radio("Navigation", ["Home", "History", "About"])
+
+# Path to save history file
+HISTORY_FILE = "recommendation_history.json"
+
+def load_history():
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
+    return []
+
+def save_history(history):
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2, ensure_ascii=False)
 
 # Custom CSS for travel vibes and text color
 st.markdown("""
@@ -160,6 +179,14 @@ if page == "Home":
                     }
                     recommendations = get_travel_recommendations(user_inputs)
 
+                    # Save to history
+                    history = load_history()
+                    history.append({
+                        "user_interests": user_interests,
+                        "recommendations": recommendations
+                    })
+                    save_history(history)
+
                     # st.success("Here are your personalized travel recommendations!")
                     st.markdown('<div class="custom-success">Here are your personalized travel recommendations!</div>', unsafe_allow_html=True)
 
@@ -186,6 +213,36 @@ if page == "Home":
         else:
             st.warning("Please enter your interests to get recommendations.")
 
+elif page == "History":
+    st.markdown('<h1 style="color:black;">📜 Travel Recommendations History</h1>', unsafe_allow_html=True)
+    history = load_history()
+    if history:
+        # Reverse to show latest first
+        reversed_history = history[::-1]
+        for idx, entry in enumerate(reversed_history, 1):
+            user_interests = entry.get('user_interests', '')
+            # Truncate user interests to first 50 characters
+            truncated_interests = user_interests[:50] + "..." if len(user_interests) > 50 else user_interests
+            with st.expander(f"Recommendation #{idx}: {truncated_interests}"):
+                col1, col2 = st.columns([4, 1])
+                with col1:
+                    st.markdown(f"**Full User Interests:** {user_interests}")
+                    recs = entry.get('recommendations', {})
+                    if isinstance(recs, dict):
+                        human_readable = recs.get("human_readable", "")
+                        st.markdown(human_readable)
+                    else:
+                        st.markdown(str(recs))
+                with col2:
+                    if st.button("Delete", key=f"delete_{idx}"):
+                        # Remove the entry from original history
+                        original_idx = len(history) - idx
+                        history.pop(original_idx)
+                        save_history(history)
+                        st.success("Entry deleted successfully.")
+    else:
+        st.info("No history found. Generate some travel recommendations first!")
+
 elif page == "About":
     st.markdown('<h1 style="color:black;">About AI Travel Guider</h1>', unsafe_allow_html=True)
     st.markdown('<p style="color:black;">This app uses AI to provide personalized travel recommendations based on your interests. Powered by Groq AI and built with Streamlit.</p>', unsafe_allow_html=True)
@@ -194,4 +251,4 @@ elif page == "About":
 
 # Footer
 st.markdown("---")
-st.markdown("Built with ❤️ using Streamlit and Groq AI")
+st.markdown("Built with ❤️ for travellers")
