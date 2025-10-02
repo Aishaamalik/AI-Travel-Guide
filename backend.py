@@ -17,6 +17,22 @@ llm = ChatGroq(
     max_tokens=2500
 )
 
+def get_day_by_day_itinerary(destination, days):
+    """
+    Generate a detailed day-by-day itinerary for a specific destination.
+    """
+    prompt = f"""SYSTEM:
+You are an expert travel planner. Provide a detailed day-by-day itinerary for the destination "{destination}" over {days} days. Make it engaging, practical, and realistic. Include activities, meals, transportation tips, and any safety notes.
+
+OUTPUT SPEC:
+Provide a human-readable markdown format with headings for each day, bullet points for activities, and suggestions for meals/rest.
+
+END.
+"""
+
+    response = llm.invoke(prompt)
+    return {"human_readable": response.content, "machine_readable": {}}
+
 def get_travel_recommendations(user_inputs):
     """
     Generate travel recommendations based on user inputs.

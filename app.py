@@ -1,6 +1,6 @@
 import streamlit as st
 import base64
-from backend import get_travel_recommendations
+from backend import get_travel_recommendations, get_day_by_day_itinerary
 
 # Set page configuration
 st.set_page_config(
@@ -53,7 +53,7 @@ import json
 import os
 
 # Sidebar navigation
-page = st.sidebar.radio("Navigation", ["Home", "History", "About"])
+page = st.sidebar.radio("Navigation", ["Home", "History", "Day-By-Day Plan", "About"])
 
 # Path to save history file
 HISTORY_FILE = "recommendation_history.json"
@@ -242,6 +242,30 @@ elif page == "History":
                         st.success("Entry deleted successfully.")
     else:
         st.info("No history found. Generate some travel recommendations first!")
+
+elif page == "Day-By-Day Plan":
+    st.markdown('<h1 style="color:black;">📅 Day-By-Day Plan</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="color:black;">Get a detailed day-by-day itinerary for your chosen destination.</p>', unsafe_allow_html=True)
+
+    destination = st.text_input("Enter the destination (e.g., Paris, France)", placeholder="e.g., Tokyo, Japan")
+    days = st.number_input("Number of days", min_value=1, max_value=30, value=7, step=1)
+
+    if st.button("Generate Day-By-Day Plan", type="primary"):
+        if destination.strip():
+            with st.spinner("Generating your day-by-day plan..."):
+                try:
+                    itinerary = get_day_by_day_itinerary(destination, days)
+                    st.markdown('<div class="custom-success">Here is your day-by-day plan!</div>', unsafe_allow_html=True)
+                    if isinstance(itinerary, dict):
+                        human_readable = itinerary.get("human_readable", "")
+                        st.markdown(human_readable)
+                    else:
+                        st.markdown(itinerary)
+                except Exception as e:
+                    st.error(f"An error occurred: {str(e)}")
+                    st.info("Please check your Groq API key in the .env file and ensure all dependencies are installed.")
+        else:
+            st.warning("Please enter a destination.")
 
 elif page == "About":
     st.markdown('<h1 style="color:black;">About AI Travel Guider</h1>', unsafe_allow_html=True)
