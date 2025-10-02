@@ -1,4 +1,5 @@
 import os
+import json
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
@@ -53,7 +54,7 @@ TASK:
 Based on the inputs above, generate a comprehensive travel guide as a human-friendly section (readable text with headings, short paragraphs, and bullet lists) intended for display in Streamlit. Make this engaging, practical, and no more than ~300 words per recommended destination.
 
 REQUIREMENTS & OUTPUT SPEC:
-Provide 3–5 destination suggestions that best match the user's interests. For each destination include details like name, country, why it matches, current weather, best time to visit, budget, activities, attractions, packing, safety, accessibility, itinerary, cultural tips, and contact info.
+Provide 2-3 destination suggestions that best match the user's interests. For each destination include details like name, country, why it matches, current weather, best time to visit, budget, activities, attractions, packing, safety, accessibility, itinerary, cultural tips, and contact info.
 
 Include a packing checklist categorized into Documents, Clothing, Health & First Aid, Electronics, Food & Water, Weather-specific, Safety & Navigation, Misc.
 
@@ -61,7 +62,6 @@ Provide a quick summary, itinerary hints, and budget breakdown.
 
 Weather: Include temperatures in Celsius and Fahrenheit, with source and timestamp.
 
-Output: Return the guide as a single Markdown-friendly string with headers and bullets.
 
 8. Safety & legal:
    - Do NOT give medical, legal, or professional emergency advice beyond general first-aid basics. For medical issues, instruct users to contact local emergency services.
@@ -73,7 +73,7 @@ Output: Return the guide as a single Markdown-friendly string with headers and b
 
 10. Extra features (optional if relevant):
    - Suggested packing checklist download filename suggestion (e.g., "PackingChecklist_TopDestination.pdf")
-   - Local phrases (2–3 useful phrases) and pronunciations
+   - Local phrases (2-3 useful phrases) and pronunciations
    - Transport tips (how to get around, typical taxi fare estimate)
    - Sustainability tips (how to travel responsibly)
 
@@ -85,4 +85,10 @@ END.
 """
 
     response = llm.invoke(prompt)
-    return response.content
+    # Try to parse the response content as JSON to get structured data
+    try:
+        data = json.loads(response.content)
+        return data
+    except json.JSONDecodeError:
+        # If parsing fails, fallback to returning raw content as human_readable text
+        return {"human_readable": response.content, "machine_readable": {}}

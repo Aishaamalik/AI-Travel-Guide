@@ -56,13 +56,17 @@ page = st.sidebar.radio("Navigation", ["Home", "About"])
 st.markdown("""
 <style>
     .main {
-        color: black;
+        color: black !important;
     }
     .stTitle {
         color: black !important;
         font-weight: bold;
     }
     .stMarkdown {
+        color: black !important;
+    }
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4, .stMarkdown h5, .stMarkdown h6,
+    .stMarkdown p, .stMarkdown li, .stMarkdown span, .stMarkdown div, .stMarkdown strong, .stMarkdown em {
         color: black !important;
     }
     .recommendations, .recommendations * {
@@ -158,7 +162,23 @@ if page == "Home":
 
                     # st.success("Here are your personalized travel recommendations!")
                     st.markdown('<div class="custom-success">Here are your personalized travel recommendations!</div>', unsafe_allow_html=True)
-                    st.markdown(f'<div class="recommendations">{recommendations}</div>', unsafe_allow_html=True)
+
+                    # Display structured recommendations
+                    if isinstance(recommendations, dict):
+                        human_readable = recommendations.get("human_readable", "")
+                        machine_readable = recommendations.get("machine_readable", {})
+
+                        # Display the human-readable markdown content
+                        st.markdown(human_readable)
+
+                        # If machine_readable has data, display it in a collapsible section or tabs
+                        # Removed display of machine_readable JSON as per user request
+                        # if machine_readable:
+                        #     with st.expander("Detailed Structured Data"):
+                        #         st.json(machine_readable)
+                    else:
+                        # Fallback if not dict
+                        st.markdown(recommendations)
 
                 except Exception as e:
                     st.error(f"An error occurred: {str(e)}")
